@@ -1,4 +1,3 @@
-// backend/models/performanceModel.ts
 import { pool } from "../db/pool.ts";
 
 // Fetch all player data from the database

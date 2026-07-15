@@ -1,0 +1,38 @@
+---
+import '../styles/global.css';
+
+const response = await fetch('http://localhost:3001/api/performance'); 
+const players = await response.json();
+---
+
+
+  <div class="p-8">
+    <h1 class="text-3xl font-bold mb-6">Player Performances</h1>
+    
+    <div class="overflow-x-auto bg-white rounded-lg shadow">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-50 border-b">
+            <th class="p-4 font-semibold">Player</th>
+            <th class="p-4 font-semibold">Team</th>
+            <th class="p-4 font-semibold">Position</th>
+            <th class="p-4 font-semibold">Goals</th>
+            <th class="p-4 font-semibold">Assists</th>
+            <th class="p-4 font-semibold">Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          {players.map((p) => (
+            <tr class="border-b hover:bg-gray-50">
+              <td class="p-4 font-medium">{p.player_name}</td>
+              <td class="p-4">{p.team}</td>
+              <td class="p-4">{p.position}</td>
+              <td class="p-4">{p.total_goals_tournament}</td>
+              <td class="p-4">{p.total_assists_tournament}</td>
+              <td class="p-4 font-bold text-green-600">{p.tournament_rating}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
