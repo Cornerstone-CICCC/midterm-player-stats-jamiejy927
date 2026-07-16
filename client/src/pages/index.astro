@@ -1,38 +1,72 @@
 ---
+export const prerender = false;
 import '../styles/global.css';
 
-const response = await fetch('http://localhost:3001/api/performance'); 
-const players = await response.json();
+const page = Astro.url.searchParams.get('page') || '1';
+const search = Astro.url.searchParams.get('search') || '';
+const limit = '20';
+
+let players: any[] = [];
+try {
+  const url = `http://localhost:3001/api/performance?page=${page}&search=${search}&limit=${limit}`;
+  const response = await fetch(url);
+  players = await response.json();
+} catch (error) {
+  console.error("Fetch error:", error);
+}
 ---
 
+<div class="p-8">
+  <h1 class="text-3xl font-bold mb-6">Player Performances</h1>
+  
+  <form class="mb-6 flex gap-2" method="GET" action="/">
+    <input type="text" name="search" value={search} placeholder="Search name..." class="border p-2 rounded w-64" />
+    <button type="submit" class="bg-blue-500 text-white p-2 px-4 rounded">Search</button>
+    <a href="/" class="p-2 text-gray-500 underline">Reset</a>
+  </form>
 
-  <div class="p-8">
-    <h1 class="text-3xl font-bold mb-6">Player Performances</h1>
-    
-    <div class="overflow-x-auto bg-white rounded-lg shadow">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="bg-gray-50 border-b">
-            <th class="p-4 font-semibold">Player</th>
-            <th class="p-4 font-semibold">Team</th>
-            <th class="p-4 font-semibold">Position</th>
-            <th class="p-4 font-semibold">Goals</th>
-            <th class="p-4 font-semibold">Assists</th>
-            <th class="p-4 font-semibold">Rating</th>
+  <div class="overflow-x-auto bg-white rounded-lg shadow">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-gray-50 border-b">
+          <th class="p-4 font-semibold">Player</th>
+          <th class="p-4 font-semibold">Team</th>
+          <th class="p-4 font-semibold">Position</th>
+          <th class="p-4 font-semibold">Goals</th>
+          <th class="p-4 font-semibold">Assists</th>
+          <th class="p-4 font-semibold">Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        {players.map((p: any) => (
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-4">{p.player_name}</td>
+            <td class="p-4">{p.team}</td>
+            <td class="p-4">{p.position}</td>
+            <td class="p-4">{p.total_goals_tournament}</td>
+            <td class="p-4">{p.total_assists_tournament}</td>
+            <td class="p-4 font-bold text-green-600">{p.tournament_rating}</td>
           </tr>
-        </thead>
-        <tbody>
-          {players.map((p) => (
-            <tr class="border-b hover:bg-gray-50">
-              <td class="p-4 font-medium">{p.player_name}</td>
-              <td class="p-4">{p.team}</td>
-              <td class="p-4">{p.position}</td>
-              <td class="p-4">{p.total_goals_tournament}</td>
-              <td class="p-4">{p.total_assists_tournament}</td>
-              <td class="p-4 font-bold text-green-600">{p.tournament_rating}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </table>
   </div>
+
+  <div class="flex gap-4 mt-6 items-center">
+    <button 
+      onclick={`window.location.href='/?page=${Math.max(1, parseInt(page) - 1)}&search=${search}'`}
+      class="bg-gray-500 text-white p-2 px-4 rounded"
+    >
+      Prev
+    </button>
+    
+    <span class="font-bold">Current Page: {page}</span>
+    
+    <button 
+      onclick={`window.location.href='/?page=${parseInt(page) + 1}&search=${search}'`}
+      class="bg-blue-500 text-white p-2 px-4 rounded"
+    >
+      Next
+    </button>
+  </div>
+</div>

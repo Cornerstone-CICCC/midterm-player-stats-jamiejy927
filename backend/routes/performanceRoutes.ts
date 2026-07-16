@@ -1,16 +1,19 @@
 import express from "express";
-import { getAllPerformance } from "../models/performanceModel.ts";
+import { getPerformances } from "../models/performanceModel.ts";
 
 const router = express.Router();
 
-// API endpoint to get player data
 router.get("/", async (req, res) => {
-  try {
-    const players = await getAllPerformance();
-    res.json(players);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch player data" });
-  }
+  console.log("--- request! ---");
+  console.log("REQ QUERY:", req.query); 
+  
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = 20;
+  const offset = (page - 1) * limit;
+  const search = (req.query.search as string) || '';
+
+  const players = await getPerformances(limit, offset, search);
+  res.json(players);
 });
 
 export default router;
