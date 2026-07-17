@@ -1,0 +1,34 @@
+---
+// [id].astro
+const { id } = Astro.params;
+const response = await fetch(`http://localhost:3001/api/performance/player/${id}`);
+const player = await response.json();
+---
+
+<html>
+<body>
+  <h1>Edit Player: {player.player_name}</h1>
+  <form id="editForm">
+    <input type="text" id="name" value={player.player_name} />
+    <input type="text" id="team" value={player.team} />
+    <input type="text" id="position" value={player.position} />
+    <button type="submit">Update</button>
+  </form>
+
+  <script define:vars={{ id }}>
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await fetch(`http://localhost:3001/api/performance/player/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          player_name: document.getElementById('name').value,
+          team: document.getElementById('team').value,
+          position: document.getElementById('position').value
+        })
+      });
+      alert('Updated!');
+    });
+  </script>
+</body>
+</html>
