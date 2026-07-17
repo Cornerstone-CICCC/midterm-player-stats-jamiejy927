@@ -40,7 +40,11 @@ try {
       <tbody>
         {players.map((p: any) => (
           <tr class="border-b hover:bg-gray-50">
-            <td class="p-4">{p.player_name}</td>
+           <td class="p-4">
+              <a href={`/player/${p.player_id}`} class="text-blue-600 hover:underline">
+                {p.player_name}
+              </a>
+            </td>
             <td class="p-4">{p.team}</td>
             <td class="p-4">{p.position}</td>
             <td class="p-4">{p.total_goals_tournament}</td>
