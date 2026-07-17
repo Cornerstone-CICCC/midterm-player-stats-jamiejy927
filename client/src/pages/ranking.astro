@@ -1,0 +1,65 @@
+---
+import '../styles/global.css';
+
+const sortBy = Astro.url.searchParams.get('sortBy') || 'total_goals_tournament';
+
+let topPlayers = [];
+try {
+  const response = await fetch(`http://localhost:3001/api/performance/rankings?sortBy=${sortBy}`);
+  topPlayers = await response.json();
+} catch (error) {
+  console.error("Error fetching rankings:", error);
+}
+---
+
+<div class="p-8">
+  <div class="mb-6">
+    <div class="flex justify-between items-center">
+      <h1 class="text-3xl font-bold">Rankings</h1>
+      <a href="/" class="text-blue-500 underline">Back to Performances</a>
+    </div>
+    <p class="text-gray-600">Explore the top players in World Cup 2026 across key performance metrics.</p>
+  </div>
+
+  <div class="flex justify-end w-full mb-4">
+    <div class="flex items-center gap-2">
+      <span class="text-sm font-semibold text-gray-700">Sort by</span>
+      <select 
+        id="sortSelect" 
+        class="border p-2 rounded w-40"
+        onchange="window.location.href=`?sortBy=${this.value}`"
+      >
+        <option value="total_goals_tournament" selected={sortBy === 'total_goals_tournament'}>Goals</option>
+        <option value="total_assists_tournament" selected={sortBy === 'total_assists_tournament'}>Assists</option>
+        <option value="tournament_rating" selected={sortBy === 'tournament_rating'}>Rating</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto bg-white rounded-lg shadow">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-gray-50 border-b">
+          <th class="p-4 font-semibold">Rank</th>
+          <th class="p-4 font-semibold">Player</th>
+          <th class="p-4 font-semibold">Team</th>
+          <th class="p-4 font-semibold">Goals</th>
+          <th class="p-4 font-semibold">Assists</th>
+          <th class="p-4 font-semibold">Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        {topPlayers.map((p: any, index: number) => (
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-4 font-bold text-gray-700">{index + 1}</td>
+            <td class="p-4 text-blue-600 font-medium">{p.player_name}</td>
+            <td class="p-4">{p.team}</td>
+            <td class="p-4">{p.total_goals_tournament}</td>
+            <td class="p-4">{p.total_assists_tournament}</td>
+            <td class="p-4 font-bold text-green-600">{p.tournament_rating}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>

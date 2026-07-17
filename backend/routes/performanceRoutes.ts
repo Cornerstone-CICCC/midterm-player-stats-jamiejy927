@@ -45,4 +45,16 @@ router.put("/player/:id", async (req, res) => {
   res.json({ message: "Updated successfully" });
 });
 
+router.get("/rankings", async (req, res) => {
+  const sortBy = req.query.sortBy as string || 'total_goals_tournament';
+  try {
+    const result = await pool.query(
+      `SELECT * FROM players ORDER BY ${sortBy} DESC LIMIT 10`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
 export default router;
