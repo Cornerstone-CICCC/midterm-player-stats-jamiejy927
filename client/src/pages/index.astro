@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import '../styles/global.css';
-import Layout from '../layouts/Layout.astro'; // 레이아웃 불러오기
+import Layout from '../layouts/Layout.astro';
 
 const page = parseInt(Astro.url.searchParams.get('page') || '1');
 const search = Astro.url.searchParams.get('search') || '';
@@ -49,7 +49,6 @@ const totalPages = Math.max(1, Math.ceil(totalCount / limit));
       </select>
       
       <div class="flex gap-2 items-center">
-        <!-- Prev -->
         <a href={`/?page=${Math.max(1, page - 1)}&limit=${limit}&search=${search}&sortBy=${sortBy}`} 
            class={`border p-2 px-3 bg-white rounded ${page <= 1 ? 'pointer-events-none opacity-50' : ''}`}>Prev</a>
         
@@ -68,7 +67,6 @@ const totalPages = Math.max(1, Math.ceil(totalCount / limit));
           }
         </div>
 
-        <!-- Next -->
         <a href={`/?page=${Math.min(totalPages, page + 1)}&limit=${limit}&search=${search}&sortBy=${sortBy}`} 
            class={`border p-2 px-3 bg-white rounded ${page >= totalPages ? 'pointer-events-none opacity-50' : ''}`}>Next</a>
       </div>
@@ -79,34 +77,36 @@ const totalPages = Math.max(1, Math.ceil(totalCount / limit));
     <table class="w-full text-left border-collapse">
       <thead>
         <tr class="bg-gray-50 border-b">
-          {[
-            { id: 'player_name', label: 'Player' },
-            { id: 'team', label: 'Team' },
-            { id: 'position', label: 'Position' },
-            { id: 'total_goals_tournament', label: 'Goals' },
-            { id: 'total_assists_tournament', label: 'Assists' },
-            { id: 'tournament_rating', label: 'Rating' }
-          ].map((col) => (
-            <th class="p-4 font-semibold">
-              <a href={`/?sortBy=${col.id}&page=${page}&limit=${limit}&search=${search}`} class="flex items-center gap-1 hover:text-blue-600">
-                {col.label}
-              </a>
-            </th>
-          ))}
+          <th class="p-4 font-semibold">Player</th>
+          <th class="p-4 font-semibold">Team</th>
+          <th class="p-4 font-semibold">Opponent</th>
+          <th class="p-4 font-semibold">Match Date</th>
+          <th class="p-4 font-semibold">Position</th>
+          <th class="p-4 font-semibold">Min</th>
+          <th class="p-4 font-semibold">Goals</th>
+          <th class="p-4 font-semibold">Assists</th>
+          <th class="p-4 font-semibold">Shots</th>
+          <th class="p-4 font-semibold">Pass Acc.</th>
+          <th class="p-4 font-semibold">Rating</th>
         </tr>
       </thead>
-      <tbody>
-        {players.map((p: any) => (
-          <tr class="border-b hover:bg-gray-50">
-            <td class="p-4"><a href={`/player/${p.player_id}`} class="text-blue-600 hover:underline">{p.player_name}</a></td>
-            <td class="p-4">{p.team}</td>
-            <td class="p-4">{p.position}</td>
-            <td class="p-4">{p.total_goals_tournament}</td>
-            <td class="p-4">{p.total_assists_tournament}</td>
-            <td class="p-4 font-bold text-green-600">{p.tournament_rating}</td>
-          </tr>
-        ))}
-      </tbody>
+<tbody>
+  {players.map((p: any) => (
+    <tr class="border-b hover:bg-gray-50">
+      <td class="p-4"><a href={`/performance/${p.performance_id}`} class="text-blue-600 hover:underline">{p.player_name}</a></td>
+      <td class="p-4">{p.team}</td>
+      <td class="p-4">{p.opponent}</td> <!-- 이제 여기에 값이 들어갑니다 -->
+      <td class="p-4">{p.match_date ? new Date(p.match_date).toLocaleDateString() : 'N/A'}</td> <!-- 이제 날짜가 들어갑니다 -->
+      <td class="p-4">{p.position}</td>
+      <td class="p-4">{p.minutes_played}</td>
+      <td class="p-4">{p.goals}</td>
+      <td class="p-4">{p.assists}</td>
+      <td class="p-4">{p.shots}</td>
+      <td class="p-4">{p.pass_accuracy}%</td>
+      <td class="p-4 font-bold text-green-600">{p.player_rating}</td>
+    </tr>
+  ))}
+</tbody>
     </table>
   </div>
 </Layout>

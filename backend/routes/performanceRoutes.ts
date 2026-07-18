@@ -4,13 +4,55 @@ import { getPerformances } from "../models/performanceModel.ts";
 
 const router = express.Router();
 
+router.get("/performance-detail/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    // p.opponent_team으로 수정했습니다
+    const query = `
+      SELECT p.*, pl.player_name, pl.position, pl.jersey_number, pl.nationality, pl.team,
+             m.match_date
+      FROM performances p
+      JOIN players pl ON p.player_id = pl.player_id
+      JOIN matches m ON p.match_id = m.match_id
+      WHERE p.id = $1
+    `;
+    const result = await pool.query(query, [id]);
+    
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]);
+    } else {
+      res.status(404).json({ error: "Performance not found" });
+    }
+  } catch (err) {
+    console.error("Detail API error:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
+router.put("/performance/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { goals, assists, shots, minutes_played, player_rating } = req.body;
+    
+    await pool.query(
+      `UPDATE performances 
+       SET goals = $1, assists = $2, shots = $3, minutes_played = $4, player_rating = $5 
+       WHERE id = $6`,
+      [goals, assists, shots, minutes_played, player_rating, id]
+    );
+    res.json({ message: "Updated successfully" });
+  } catch (err) {
+    console.error("Update API error:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
 router.get("/count", async (req, res) => {
   try {
     const search = (req.query.search as string) || '';
     const query = "SELECT COUNT(*) FROM players WHERE player_name ILIKE $1";
     const result = await pool.query(query, [`%${search}%`]);
     
-    console.log("DB count result:", result.rows[0]);
     res.json({ count: parseInt(result.rows[0].count) });
   } catch (err) {
     console.error("Count API error:", err);
@@ -29,34 +71,9 @@ router.get("/", async (req, res) => {
     const players = await getPerformances(limit, offset, search, sortBy);
     res.json(players);
   } catch (err) {
+    console.error("List API error:", err);
     res.status(500).json({ error: "Server Error" });
   }
-});
-
-router.get("/player/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await pool.query("SELECT * FROM players WHERE player_id = $1", [id]);
-    
-    if (result.rows.length > 0) {
-      res.json(result.rows[0]);
-    } else {
-      res.status(404).json({ error: "Player not found" });
-    }
-  } catch (err) {
-    console.error("DB Error:", err);
-    res.status(500).json({ error: "Server Error" });
-  }
-});
-
-router.put("/player/:id", async (req, res) => {
-  const { id } = req.params;
-  const { player_name, team, position } = req.body;
-  await pool.query(
-    "UPDATE players SET player_name = $1, team = $2, position = $3 WHERE player_id = $4",
-    [player_name, team, position, id]
-  );
-  res.json({ message: "Updated successfully" });
 });
 
 router.get("/rankings", async (req, res) => {
@@ -81,7 +98,7 @@ router.get("/rankings", async (req, res) => {
     const result = await pool.query(query);
     res.json(result.rows);
   } catch (err) {
-    console.error("Database Error:", err);
+    console.error("Rankings API error:", err);
     res.status(500).json({ error: "Server Error" });
   }
 });

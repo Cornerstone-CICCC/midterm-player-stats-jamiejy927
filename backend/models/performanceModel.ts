@@ -1,32 +1,27 @@
 import { pool } from "../db/pool.ts";
 
 export const getPerformances = async (limit: number, offset: number, search: string, sortBy: string) => {
-  const sortMap: { [key: string]: string } = {
-    'player_name': 'pl.player_name ASC',
-    'team': 'pl.team ASC',
-    'position': 'pl.position ASC',
-    'total_goals_tournament': 'total_goals_tournament DESC',
-    'total_assists_tournament': 'total_assists_tournament DESC',
-    'tournament_rating': 'tournament_rating DESC'
-  };
-
-  const orderBy = sortMap[sortBy] || 'pl.player_id ASC';
-
   const query = `
     SELECT 
-      pl.player_id, pl.player_name, pl.team, pl.position, 
-      SUM(p.goals) as total_goals_tournament, 
-      SUM(p.assists) as total_assists_tournament, 
-      ROUND(AVG(p.player_rating)::numeric, 1) as tournament_rating
-    FROM players pl
-    JOIN performances p ON pl.player_id = p.player_id
+      p.id AS performance_id,
+      pl.player_name, 
+      pl.team, 
+      pl.position,
+      p.opponent_team AS opponent,
+      m.match_date,
+      p.minutes_played,
+      p.goals,
+      p.assists,
+      p.shots,
+      p.pass_accuracy,
+      p.player_rating
+    FROM performances p
+    JOIN players pl ON p.player_id = pl.player_id
+    JOIN matches m ON p.match_id = m.match_id
     WHERE pl.player_name ILIKE $1
-    GROUP BY pl.player_id, pl.player_name, pl.team, pl.position
-    ORDER BY ${orderBy}
+    ORDER BY p.id DESC
     LIMIT $2 OFFSET $3
   `;
-  
-  const values = [`%${search}%`, limit, offset];
-  const result = await pool.query(query, values);
+  const result = await pool.query(query, [`%${search}%`, limit, offset]);
   return result.rows; 
 };
