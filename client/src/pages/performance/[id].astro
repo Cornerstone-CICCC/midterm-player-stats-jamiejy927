@@ -20,9 +20,7 @@ try {
     <a href="/" class="text-blue-600 mb-4 inline-block font-bold hover:underline">&larr; Back to Performances</a>
     <h1 class="text-3xl font-bold mb-6">Edit Performance</h1>
 
-    <!-- Player Header -->
     <div class="bg-white p-6 rounded-xl shadow-sm mb-6 flex items-center justify-between border border-gray-200">
-      <!-- 왼쪽: 선수 정보 -->
       <div class="flex items-center">
         <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
           {perf.player_name ? perf.player_name.substring(0, 2).toUpperCase() : '??'}
@@ -32,8 +30,6 @@ try {
           <p class="text-gray-500">#{perf.jersey_number || '0'} | {perf.position || 'N/A'}</p>
         </div>
       </div>
-
-      <!-- 중앙: 매치 정보 -->
       <div class="text-center bg-gray-50 p-4 rounded-lg border border-gray-100 min-w-[200px]">
         <p class="font-bold text-lg">{perf.team} vs {perf.opponent_team}</p>
         <p class="text-sm text-gray-600">{perf.stadium || 'N/A'}</p>
@@ -41,22 +37,22 @@ try {
           Result: {perf.match_result || 'N/A'}
         </div>
       </div>
-
-      <!-- 오른쪽: 날짜 -->
       <div class="text-right text-sm text-gray-500">
         <p>Date: {perf.match_date ? new Date(perf.match_date).toLocaleDateString() : 'N/A'}</p>
       </div>
     </div>
 
     <form id="editForm" class="grid grid-cols-2 gap-6">
-      <!-- Attacking: 4열 배치 -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 col-span-2">
         <h3 class="font-bold mb-4 text-blue-600 border-b pb-2">Attacking</h3>
         <div class="grid grid-cols-4 gap-4">
-          <div><label class="block text-xs text-gray-500 uppercase">Goals</label><input type="number" id="goals" value={perf.goals || 0} class="w-full border p-2 rounded" /></div>
-          <div><label class="block text-xs text-gray-500 uppercase">Assists</label><input type="number" id="assists" value={perf.assists || 0} class="w-full border p-2 rounded" /></div>
-          <div><label class="block text-xs text-gray-500 uppercase">Shots</label><input type="number" id="shots" value={perf.shots || 0} class="w-full border p-2 rounded" /></div>
-          <div><label class="block text-xs text-gray-500 uppercase">Key Passes</label><input type="number" id="key_passes" value={perf.key_passes || 0} class="w-full border p-2 rounded" /></div>
+          <div><label class="block text-xs text-gray-500 uppercase">Goals</label><input type="number" min="0" id="goals" value={perf.goals || 0} class="w-full border p-2 rounded" /></div>
+          <div><label class="block text-xs text-gray-500 uppercase">Assists</label><input type="number" min="0" id="assists" value={perf.assists || 0} class="w-full border p-2 rounded" /></div>
+          <div><label class="block text-xs text-gray-500 uppercase">Shots</label><input type="number" min="0" id="shots" value={perf.shots || 0} class="w-full border p-2 rounded" /></div>
+          <div><label class="block text-xs text-gray-500 uppercase">Shots on Target</label><input type="number" min="0" id="shots_on_target" value={perf.shots_on_target || 0} class="w-full border p-2 rounded" /></div>
+          <div><label class="block text-xs text-gray-500 uppercase">Key Passes</label><input type="number" min="0" id="key_passes" value={perf.key_passes || 0} class="w-full border p-2 rounded" /></div>
+          <div><label class="block text-xs text-gray-500 uppercase">Successful Dribbles</label><input type="number" min="0" id="successful_dribbles" value={perf.successful_dribbles || 0} class="w-full border p-2 rounded" /></div>
+          <div><label class="block text-xs text-gray-500 uppercase">Crosses</label><input type="number" min="0" id="crosses" value={perf.crosses || 0} class="w-full border p-2 rounded" /></div>
         </div>
       </div>
 
@@ -83,36 +79,34 @@ try {
     </form>
   </div>
 
-  <script define:vars={{ id }}>
+<script define:vars={{ id }}>
     document.getElementById('editForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const getVal = (id) => Math.max(0, parseFloat(document.getElementById(id).value) || 0);
+
       const data = {
-        goals: parseInt(document.getElementById('goals').value),
-        assists: parseInt(document.getElementById('assists').value),
-        shots: parseInt(document.getElementById('shots').value),
-        key_passes: parseInt(document.getElementById('key_passes').value),
-        tackles: parseInt(document.getElementById('tackles').value),
-        interceptions: parseInt(document.getElementById('interceptions').value),
-        minutes_played: parseInt(document.getElementById('minutes').value),
-        player_rating: parseFloat(document.getElementById('rating').value)
+        goals: getVal('goals'), 
+        assists: getVal('assists'), 
+        shots: getVal('shots'), 
+        shots_on_target: getVal('shots_on_target'), 
+        key_passes: getVal('key_passes'),
+        successful_dribbles: getVal('successful_dribbles'), 
+        crosses: getVal('crosses'),
+        tackles: getVal('tackles'), 
+        interceptions: getVal('interceptions'),
+        minutes_played: getVal('minutes'), 
+        player_rating: parseFloat(document.getElementById('rating').value) || 0
       };
 
       try {
-        const res = await fetch(`http://localhost:3001/api/performance/performance/${id}`, {
+        const res = await fetch(`http://localhost:3001/api/performance/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
-
-        if (res.ok) {
-          alert('Update successful!');
-          window.location.href = '/';
-        } else {
-          alert('Update failed');
-        }
-      } catch (err) {
-        alert('Server error');
-      }
+        if (res.ok) { alert('Update successful!'); window.location.href = '/'; }
+        else { alert('Update failed'); }
+      } catch (err) { alert('Server error'); }
     });
   </script>
 </Layout>

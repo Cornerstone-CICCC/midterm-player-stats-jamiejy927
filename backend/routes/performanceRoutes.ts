@@ -7,16 +7,15 @@ const router = express.Router();
 router.get("/performance-detail/:id", async (req, res) => {
   try {
     const { id } = req.params;
-const query = `
-  SELECT p.*, pl.player_name, pl.position, pl.jersey_number, pl.nationality, pl.team,
-         m.match_date, m.stadium, m.tournament_stage
-  FROM performances p
-  JOIN players pl ON p.player_id = pl.player_id
-  JOIN matches m ON p.match_id = m.match_id
-  WHERE p.id = $1
-`;
+    const query = `
+      SELECT p.*, pl.player_name, pl.position, pl.jersey_number, pl.nationality, pl.team,
+             m.match_date, m.stadium, m.tournament_stage
+      FROM performances p
+      JOIN players pl ON p.player_id = pl.player_id
+      JOIN matches m ON p.match_id = m.match_id
+      WHERE p.id = $1
+    `;
     const result = await pool.query(query, [id]);
-    
     if (result.rows.length > 0) {
       res.json(result.rows[0]);
     } else {
@@ -28,17 +27,27 @@ const query = `
   }
 });
 
-router.put("/performance/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { goals, assists, shots, minutes_played, player_rating } = req.body;
+    const { 
+      goals, assists, shots, shots_on_target, key_passes, 
+      successful_dribbles, dribbles_attempted, crosses, successful_crosses,
+      tackles, interceptions, minutes_played, player_rating 
+    } = req.body;
     
-    await pool.query(
-      `UPDATE performances 
-       SET goals = $1, assists = $2, shots = $3, minutes_played = $4, player_rating = $5 
-       WHERE id = $6`,
-      [goals, assists, shots, minutes_played, player_rating, id]
-    );
+await pool.query(
+  `UPDATE performances 
+   SET goals = $1, assists = $2, shots = $3, shots_on_target = $4, key_passes = $5, 
+       successful_dribbles = $6, crosses = $7,
+       tackles = $8, interceptions = $9, minutes_played = $10, player_rating = $11 
+   WHERE id = $12`,
+  [
+    goals || 0, assists || 0, shots || 0, shots_on_target || 0, key_passes || 0,
+    successful_dribbles || 0, crosses || 0,
+    tackles || 0, interceptions || 0, minutes_played || 0, player_rating || 0, id
+  ]
+);
     res.json({ message: "Updated successfully" });
   } catch (err) {
     console.error("Update API error:", err);
