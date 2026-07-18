@@ -4,14 +4,33 @@ import { getPerformances } from "../models/performanceModel.ts";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = 20;
-  const offset = (page - 1) * limit;
-  const search = (req.query.search as string) || '';
+router.get("/count", async (req, res) => {
+  try {
+    const search = (req.query.search as string) || '';
+    const query = "SELECT COUNT(*) FROM players WHERE player_name ILIKE $1";
+    const result = await pool.query(query, [`%${search}%`]);
+    
+    console.log("DB count result:", result.rows[0]);
+    res.json({ count: parseInt(result.rows[0].count) });
+  } catch (err) {
+    console.error("Count API error:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
 
-  const players = await getPerformances(limit, offset, search);
-  res.json(players);
+router.get("/", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 25;
+    const offset = (page - 1) * limit;
+    const search = (req.query.search as string) || '';
+    const sortBy = (req.query.sortBy as string) || 'player_name';
+
+    const players = await getPerformances(limit, offset, search, sortBy);
+    res.json(players);
+  } catch (err) {
+    res.status(500).json({ error: "Server Error" });
+  }
 });
 
 router.get("/player/:id", async (req, res) => {
@@ -42,23 +61,24 @@ router.put("/player/:id", async (req, res) => {
 
 router.get("/rankings", async (req, res) => {
   const sortBy = req.query.sortBy as string || 'total_goals_tournament';
-
-  const columnConfigs: { [key: string]: string } = {
-    'player_name': 'ASC',
-    'team': 'ASC',
-    'total_goals_tournament': 'DESC',
-    'total_assists_tournament': 'DESC',
-    'tournament_rating': 'DESC'
-  };
-
-  const validSortColumns = Object.keys(columnConfigs);
-  const sortColumn = validSortColumns.includes(sortBy) ? sortBy : 'total_goals_tournament';
-  const order = columnConfigs[sortColumn];
+  
+  const query = `
+    SELECT 
+      pl.player_name, 
+      pl.team, 
+      SUM(p.goals) as total_goals_tournament, 
+      SUM(p.assists) as total_assists_tournament, 
+      ROUND(AVG(p.player_rating)::numeric, 1) as tournament_rating
+    FROM players pl
+    JOIN performances p ON pl.player_id = p.player_id
+    GROUP BY pl.player_id, pl.player_name, pl.team
+    ORDER BY ${sortBy === 'total_assists_tournament' ? 'total_assists_tournament' : 
+               sortBy === 'tournament_rating' ? 'tournament_rating' : 'total_goals_tournament'} DESC
+    LIMIT 10
+  `;
 
   try {
-    const result = await pool.query(
-      `SELECT * FROM players ORDER BY ${sortColumn} ${order} LIMIT 10`
-    );
+    const result = await pool.query(query);
     res.json(result.rows);
   } catch (err) {
     console.error("Database Error:", err);

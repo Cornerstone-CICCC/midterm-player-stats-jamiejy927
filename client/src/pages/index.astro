@@ -2,49 +2,102 @@
 export const prerender = false;
 import '../styles/global.css';
 
-const page = Astro.url.searchParams.get('page') || '1';
+const page = parseInt(Astro.url.searchParams.get('page') || '1');
 const search = Astro.url.searchParams.get('search') || '';
-const limit = '20';
+const limit = parseInt(Astro.url.searchParams.get('limit') || '25');
+const sortBy = Astro.url.searchParams.get('sortBy') || 'player_name';
 
 let players: any[] = [];
+let totalCount = 0;
+
 try {
-  const url = `http://localhost:3001/api/performance?page=${page}&search=${search}&limit=${limit}`;
-  const response = await fetch(url);
-  players = await response.json();
+  const dataUrl = `http://localhost:3001/api/performance?page=${page}&limit=${limit}&search=${search}&sortBy=${sortBy}`;
+  const resData = await fetch(dataUrl);
+  if (!resData.ok) throw new Error(`Data fetch failed: ${resData.status}`);
+  players = await resData.json();
+
+  const countUrl = `http://localhost:3001/api/performance/count?search=${search}`;
+  const resCount = await fetch(countUrl);
+  if (!resCount.ok) throw new Error(`Count fetch failed: ${resCount.status}`);
+  const countData = await resCount.json();
+  
+  totalCount = parseInt(countData.count) || 0;
 } catch (error) {
-  console.error("Fetch error:", error);
+  console.error("Fetch Error Detail:", error);
 }
+
+const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 ---
 
 <div class="p-8">
   <h1 class="text-3xl font-bold mb-6">Player Performances</h1>
   
-  <form class="mb-6 flex gap-2" method="GET" action="/">
-    <input type="text" name="search" value={search} placeholder="Search name..." class="border p-2 rounded w-64" />
-    <button type="submit" class="bg-blue-500 text-white p-2 px-4 rounded">Search</button>
-    <a href="/" class="p-2 text-gray-500 underline">Reset</a>
-  </form>
+  <div class="flex justify-between items-center mb-6 bg-gray-50 p-4 rounded-lg shadow-sm">
+    <form class="flex gap-2" method="GET" action="/">
+      <input type="text" name="search" value={search} placeholder="Search..." class="border p-2 rounded w-64" />
+      <button type="submit" class="bg-blue-600 text-white p-2 px-4 rounded">Search</button>
+      <a href="/" class="p-2 text-gray-500 underline">Reset</a>
+    </form>
+
+    <div class="flex items-center gap-4">
+      <select 
+        onchange="window.location.href=`/?page=1&limit=${this.value}&search=${new URLSearchParams(window.location.search).get('search') || ''}&sortBy=${new URLSearchParams(window.location.search).get('sortBy') || 'player_name'}`" 
+        class="border p-2 rounded"
+      >
+        {[25, 50, 100].map(n => <option value={n} selected={limit === n}>{n} entries</option>)}
+      </select>
+      
+      <div class="flex gap-2 items-center">
+        <!-- Prev -->
+        <a href={`/?page=${Math.max(1, page - 1)}&limit=${limit}&search=${search}&sortBy=${sortBy}`} 
+           class={`border p-2 px-3 bg-white rounded ${page <= 1 ? 'pointer-events-none opacity-50' : ''}`}>Prev</a>
+        
+        <div class="flex gap-1">
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter(p => p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1))
+            .map((p, i, arr) => (
+              <>
+                {i > 0 && arr[i-1] !== p - 1 && <span class="px-2">...</span>}
+                <a href={`/?page=${p}&limit=${limit}&search=${search}&sortBy=${sortBy}`}
+                   class={`px-3 py-2 border rounded ${page === p ? 'bg-blue-600 text-white' : 'bg-white'}`}>
+                   {p}
+                </a>
+              </>
+            ))
+          }
+        </div>
+
+        <!-- Next -->
+        <a href={`/?page=${Math.min(totalPages, page + 1)}&limit=${limit}&search=${search}&sortBy=${sortBy}`} 
+           class={`border p-2 px-3 bg-white rounded ${page >= totalPages ? 'pointer-events-none opacity-50' : ''}`}>Next</a>
+      </div>
+    </div>
+  </div>
 
   <div class="overflow-x-auto bg-white rounded-lg shadow">
     <table class="w-full text-left border-collapse">
       <thead>
         <tr class="bg-gray-50 border-b">
-          <th class="p-4 font-semibold">Player</th>
-          <th class="p-4 font-semibold">Team</th>
-          <th class="p-4 font-semibold">Position</th>
-          <th class="p-4 font-semibold">Goals</th>
-          <th class="p-4 font-semibold">Assists</th>
-          <th class="p-4 font-semibold">Rating</th>
+          {[
+            { id: 'player_name', label: 'Player' },
+            { id: 'team', label: 'Team' },
+            { id: 'position', label: 'Position' },
+            { id: 'total_goals_tournament', label: 'Goals' },
+            { id: 'total_assists_tournament', label: 'Assists' },
+            { id: 'tournament_rating', label: 'Rating' }
+          ].map((col) => (
+            <th class="p-4 font-semibold">
+              <a href={`/?sortBy=${col.id}&page=${page}&limit=${limit}&search=${search}`} class="flex items-center gap-1 hover:text-blue-600">
+                {col.label}
+              </a>
+            </th>
+          ))}
         </tr>
       </thead>
       <tbody>
         {players.map((p: any) => (
           <tr class="border-b hover:bg-gray-50">
-           <td class="p-4">
-              <a href={`/player/${p.player_id}`} class="text-blue-600 hover:underline">
-                {p.player_name}
-              </a>
-            </td>
+            <td class="p-4"><a href={`/player/${p.player_id}`} class="text-blue-600 hover:underline">{p.player_name}</a></td>
             <td class="p-4">{p.team}</td>
             <td class="p-4">{p.position}</td>
             <td class="p-4">{p.total_goals_tournament}</td>
@@ -54,23 +107,5 @@ try {
         ))}
       </tbody>
     </table>
-  </div>
-
-  <div class="flex gap-4 mt-6 items-center">
-    <button 
-      onclick={`window.location.href='/?page=${Math.max(1, parseInt(page) - 1)}&search=${search}'`}
-      class="bg-gray-500 text-white p-2 px-4 rounded"
-    >
-      Prev
-    </button>
-    
-    <span class="font-bold">Current Page: {page}</span>
-    
-    <button 
-      onclick={`window.location.href='/?page=${parseInt(page) + 1}&search=${search}'`}
-      class="bg-blue-500 text-white p-2 px-4 rounded"
-    >
-      Next
-    </button>
   </div>
 </div>
