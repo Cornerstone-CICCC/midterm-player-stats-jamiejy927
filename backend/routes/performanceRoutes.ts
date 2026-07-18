@@ -7,15 +7,14 @@ const router = express.Router();
 router.get("/performance-detail/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    // p.opponent_team으로 수정했습니다
-    const query = `
-      SELECT p.*, pl.player_name, pl.position, pl.jersey_number, pl.nationality, pl.team,
-             m.match_date
-      FROM performances p
-      JOIN players pl ON p.player_id = pl.player_id
-      JOIN matches m ON p.match_id = m.match_id
-      WHERE p.id = $1
-    `;
+const query = `
+  SELECT p.*, pl.player_name, pl.position, pl.jersey_number, pl.nationality, pl.team,
+         m.match_date, m.stadium, m.tournament_stage
+  FROM performances p
+  JOIN players pl ON p.player_id = pl.player_id
+  JOIN matches m ON p.match_id = m.match_id
+  WHERE p.id = $1
+`;
     const result = await pool.query(query, [id]);
     
     if (result.rows.length > 0) {
