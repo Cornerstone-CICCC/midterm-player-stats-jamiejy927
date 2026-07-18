@@ -1,0 +1,7 @@
+# Project Reflection
+
+This project was a great challenge because it was my first time building a full-stack application from scratch using Astro, Node.js, Express, and PostgreSQL. I started by studying the database schema provided by the professor to understand how the `players`, `matches`, and `performances` tables were normalized and linked together. Learning how to connect these tables with JOIN queries and perform calculations was a very important experience for me.
+
+Throughout the project, I successfully implemented the main features, such as the paginated list, detailed view, and aggregate queries. I also learned how to keep the application secure by using parameterized queries. However, I struggled with time management. Because I spent a lot of time understanding the database structure and basic features, I ran out of time to implement the 'Create' function. I regret that I could not finish all the features as planned.
+
+This project taught me that development is not just about writing code, but about planning and designing the entire system. Although I could not complete the 'Create' function this time, it was a valuable lesson on the importance of setting priorities and managing my time effectively. Next time, I will plan my schedule better to deliver a more complete project. I am proud of what I have learned and will continue to work hard to improve my skills.

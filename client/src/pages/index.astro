@@ -95,8 +95,8 @@ const totalPages = Math.max(1, Math.ceil(totalCount / limit));
     <tr class="border-b hover:bg-gray-50">
       <td class="p-4"><a href={`/performance/${p.performance_id}`} class="text-blue-600 hover:underline">{p.player_name}</a></td>
       <td class="p-4">{p.team}</td>
-      <td class="p-4">{p.opponent}</td> <!-- 이제 여기에 값이 들어갑니다 -->
-      <td class="p-4">{p.match_date ? new Date(p.match_date).toLocaleDateString() : 'N/A'}</td> <!-- 이제 날짜가 들어갑니다 -->
+      <td class="p-4">{p.opponent}</td>
+      <td class="p-4">{p.match_date ? new Date(p.match_date).toLocaleDateString() : 'N/A'}</td>
       <td class="p-4">{p.position}</td>
       <td class="p-4">{p.minutes_played}</td>
       <td class="p-4">{p.goals}</td>
