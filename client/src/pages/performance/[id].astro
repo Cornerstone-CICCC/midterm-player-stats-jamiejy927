@@ -16,96 +16,105 @@ try {
 ---
 
 <Layout>
-  <div class="max-w-5xl mx-auto p-6 bg-gray-50 min-h-screen">
-    <a href="/" class="text-blue-600 mb-4 inline-block font-bold hover:underline">&larr; Back to Performances</a>
-    <h1 class="text-3xl font-bold mb-6">Edit Performance</h1>
+  <div class="max-w-5xl mx-auto p-4 bg-gray-50 min-h-screen">
+    <a href="/" class="text-blue-600 mb-2 inline-block font-bold hover:underline">&larr; Back to Performances</a>
+    <h1 class="text-2xl font-bold mb-4">Edit Performance</h1>
 
-    <div class="bg-white p-6 rounded-xl shadow-sm mb-6 flex items-center justify-between border border-gray-200">
+    <div class="bg-white p-4 rounded-xl shadow-sm mb-4 flex items-center justify-between border border-gray-200">
       <div class="flex items-center">
-        <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
+        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
           {perf.player_name ? perf.player_name.substring(0, 2).toUpperCase() : '??'}
         </div>
         <div>
-          <h2 class="text-2xl font-bold">{perf.player_name || 'Unknown Player'}</h2>
-          <p class="text-gray-500">#{perf.jersey_number || '0'} | {perf.position || 'N/A'}</p>
+          <h2 class="text-xl font-bold">{perf.player_name || 'Unknown Player'}</h2>
+          <p class="text-gray-500 text-sm">#{perf.jersey_number || '0'} | {perf.position || 'N/A'}</p>
         </div>
       </div>
-      <div class="text-center bg-gray-50 p-4 rounded-lg border border-gray-100 min-w-[200px]">
-        <p class="font-bold text-lg">{perf.team} vs {perf.opponent_team}</p>
-        <p class="text-sm text-gray-600">{perf.stadium || 'N/A'}</p>
-        <div class="mt-2 inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-bold text-sm">
+      <div class="text-center bg-gray-50 p-3 rounded-lg border border-gray-100 min-w-[150px]">
+        <p class="font-bold">{perf.team} vs {perf.opponent_team}</p>
+        <p class="text-xs text-gray-600">{perf.stadium || 'N/A'}</p>
+        <div class="mt-1 inline-block px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full font-bold text-[10px]">
           Result: {perf.match_result || 'N/A'}
         </div>
       </div>
-      <div class="text-right text-sm text-gray-500">
+      <div class="text-right text-xs text-gray-500">
         <p>Date: {perf.match_date ? new Date(perf.match_date).toLocaleDateString() : 'N/A'}</p>
       </div>
     </div>
 
-    <form id="editForm" class="grid grid-cols-2 gap-6">
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 col-span-2">
-        <h3 class="font-bold mb-4 text-blue-600 border-b pb-2">Attacking</h3>
-        <div class="grid grid-cols-4 gap-4">
-          <div><label class="block text-xs text-gray-500 uppercase">Goals</label><input type="number" min="0" id="goals" value={perf.goals || 0} class="w-full border p-2 rounded" /></div>
-          <div><label class="block text-xs text-gray-500 uppercase">Assists</label><input type="number" min="0" id="assists" value={perf.assists || 0} class="w-full border p-2 rounded" /></div>
-          <div><label class="block text-xs text-gray-500 uppercase">Shots</label><input type="number" min="0" id="shots" value={perf.shots || 0} class="w-full border p-2 rounded" /></div>
-          <div><label class="block text-xs text-gray-500 uppercase">Shots on Target</label><input type="number" min="0" id="shots_on_target" value={perf.shots_on_target || 0} class="w-full border p-2 rounded" /></div>
-          <div><label class="block text-xs text-gray-500 uppercase">Key Passes</label><input type="number" min="0" id="key_passes" value={perf.key_passes || 0} class="w-full border p-2 rounded" /></div>
-          <div><label class="block text-xs text-gray-500 uppercase">Successful Dribbles</label><input type="number" min="0" id="successful_dribbles" value={perf.successful_dribbles || 0} class="w-full border p-2 rounded" /></div>
-          <div><label class="block text-xs text-gray-500 uppercase">Crosses</label><input type="number" min="0" id="crosses" value={perf.crosses || 0} class="w-full border p-2 rounded" /></div>
+    <form id="editForm" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <!-- Attacking -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+        <h3 class="font-bold mb-2 text-blue-600 border-b pb-1 text-sm">Attacking</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="block text-[10px] text-gray-500 uppercase">Goals</label><input type="number" min="0" id="goals" value={perf.goals || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Assists</label><input type="number" min="0" id="assists" value={perf.assists || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Shots</label><input type="number" min="0" id="shots" value={perf.shots || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Shots on Target</label><input type="number" min="0" id="shots_on_target" value={perf.shots_on_target || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Key Passes</label><input type="number" min="0" id="key_passes" value={perf.key_passes || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Dribbles</label><input type="number" min="0" id="successful_dribbles" value={perf.successful_dribbles || 0} class="w-full border p-1 rounded text-sm" /></div>
         </div>
       </div>
 
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h3 class="font-bold mb-4 text-blue-600 border-b pb-2">Defensive</h3>
-        <div class="grid grid-cols-2 gap-4">
-          <div><label class="block text-xs text-gray-500 uppercase">Tackles</label><input type="number" id="tackles" value={perf.tackles || 0} class="w-full border p-2 rounded" /></div>
-          <div><label class="block text-xs text-gray-500 uppercase">Interceptions</label><input type="number" id="interceptions" value={perf.interceptions || 0} class="w-full border p-2 rounded" /></div>
+      <!-- Defensive -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+        <h3 class="font-bold mb-2 text-blue-600 border-b pb-1 text-sm">Defensive</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="block text-[10px] text-gray-500 uppercase">Tackles</label><input type="number" min="0" id="tackles" value={perf.tackles || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Interceptions</label><input type="number" min="0" id="interceptions" value={perf.interceptions || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Blocks</label><input type="number" min="0" id="blocks" value={perf.blocks || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Clearances</label><input type="number" min="0" id="clearances" value={perf.clearances || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Duels Won</label><input type="number" min="0" id="aerial_duels_won" value={perf.aerial_duels_won || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Fouls Comm.</label><input type="number" min="0" id="fouls_committed" value={perf.fouls_committed || 0} class="w-full border p-1 rounded text-sm" /></div>
         </div>
       </div>
 
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h3 class="font-bold mb-4 text-blue-600 border-b pb-2">Physical & Ratings</h3>
-        <div class="grid grid-cols-2 gap-4">
-          <div><label class="block text-xs text-gray-500 uppercase">Minutes</label><input type="number" id="minutes" value={perf.minutes_played || 0} class="w-full border p-2 rounded" /></div>
-          <div><label class="block text-xs text-gray-500 uppercase">Rating</label><input type="number" step="0.1" id="rating" value={perf.player_rating || 0} class="w-full border p-2 rounded" /></div>
+      <!-- Physical -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+        <h3 class="font-bold mb-2 text-blue-600 border-b pb-1 text-sm">Physical</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="block text-[10px] text-gray-500 uppercase">Minutes</label><input type="number" min="0" id="minutes" value={perf.minutes_played || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Distance</label><input type="number" min="0" step="0.1" id="distance" value={perf.distance_covered_km || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Sprints</label><input type="number" min="0" step="0.1" id="sprints" value={perf.sprint_distance_km || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Top Speed</label><input type="number" min="0" step="0.1" id="top_speed" value={perf.top_speed_kmh || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Accel.</label><input type="number" min="0" id="accelerations" value={perf.accelerations || 0} class="w-full border p-1 rounded text-sm" /></div>
+          <div><label class="block text-[10px] text-gray-500 uppercase">Decel.</label><input type="number" min="0" id="decelerations" value={perf.decelerations || 0} class="w-full border p-1 rounded text-sm" /></div>
         </div>
       </div>
 
-      <div class="col-span-2 flex justify-end gap-4 mt-2">
-        <button type="button" onclick="history.back()" class="px-6 py-2 border rounded bg-white hover:bg-gray-100 font-bold">Cancel</button>
-        <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-bold">Update Performance</button>
+      <!-- Ratings (완전 중앙 배치) -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col justify-center">
+        <h3 class="font-bold mb-2 text-blue-600 border-b pb-1 text-sm">Ratings</h3>
+        <div class="flex flex-col items-center justify-center flex-grow">
+            <label class="block text-[10px] text-gray-500 uppercase">Player Rating</label>
+            <input type="number" min="0" step="0.1" id="rating" value={perf.player_rating || 0} class="w-1/4 border p-1 rounded text-sm text-center" />
+        </div>
+      </div>
+
+      <div class="col-span-1 md:col-span-2 flex justify-end gap-2 mt-1">
+        <button type="button" onclick="history.back()" class="px-4 py-1.5 border rounded bg-white hover:bg-gray-100 text-sm font-bold">Cancel</button>
+        <button type="submit" class="px-4 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-bold">Update Performance</button>
       </div>
     </form>
   </div>
 
-<script define:vars={{ id }}>
+  <script define:vars={{ id }}>
     document.getElementById('editForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const getVal = (id) => Math.max(0, parseFloat(document.getElementById(id).value) || 0);
 
       const data = {
-        goals: getVal('goals'), 
-        assists: getVal('assists'), 
-        shots: getVal('shots'), 
-        shots_on_target: getVal('shots_on_target'), 
-        key_passes: getVal('key_passes'),
-        successful_dribbles: getVal('successful_dribbles'), 
-        crosses: getVal('crosses'),
-        tackles: getVal('tackles'), 
-        interceptions: getVal('interceptions'),
-        minutes_played: getVal('minutes'), 
-        player_rating: parseFloat(document.getElementById('rating').value) || 0
+        goals: getVal('goals'), assists: getVal('assists'), shots: getVal('shots'), shots_on_target: getVal('shots_on_target'), key_passes: getVal('key_passes'), successful_dribbles: getVal('successful_dribbles'),
+        tackles: getVal('tackles'), interceptions: getVal('interceptions'), blocks: getVal('blocks'), clearances: getVal('clearances'), aerial_duels_won: getVal('aerial_duels_won'), fouls_committed: getVal('fouls_committed'),
+        minutes_played: getVal('minutes'), distance_covered_km: getVal('distance'), sprint_distance_km: getVal('sprints'), top_speed_kmh: getVal('top_speed'), accelerations: getVal('accelerations'), decelerations: getVal('decelerations'),
+        player_rating: Math.max(0, parseFloat(document.getElementById('rating').value) || 0)
       };
 
       try {
         const res = await fetch(`http://localhost:3001/api/performance/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
         });
-        if (res.ok) { alert('Update successful!'); window.location.href = '/'; }
-        else { alert('Update failed'); }
+        if (res.ok) { alert('Update successful!'); window.location.href = '/'; } else { alert('Update failed'); }
       } catch (err) { alert('Server error'); }
     });
   </script>

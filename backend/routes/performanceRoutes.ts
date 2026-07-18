@@ -30,24 +30,22 @@ router.get("/performance-detail/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { 
-      goals, assists, shots, shots_on_target, key_passes, 
-      successful_dribbles, dribbles_attempted, crosses, successful_crosses,
-      tackles, interceptions, minutes_played, player_rating 
-    } = req.body;
+    const d = req.body;
     
-await pool.query(
-  `UPDATE performances 
-   SET goals = $1, assists = $2, shots = $3, shots_on_target = $4, key_passes = $5, 
-       successful_dribbles = $6, crosses = $7,
-       tackles = $8, interceptions = $9, minutes_played = $10, player_rating = $11 
-   WHERE id = $12`,
-  [
-    goals || 0, assists || 0, shots || 0, shots_on_target || 0, key_passes || 0,
-    successful_dribbles || 0, crosses || 0,
-    tackles || 0, interceptions || 0, minutes_played || 0, player_rating || 0, id
-  ]
-);
+    await pool.query(
+      `UPDATE performances 
+       SET goals = $1, assists = $2, shots = $3, shots_on_target = $4, key_passes = $5, successful_dribbles = $6,
+           tackles = $7, interceptions = $8, blocks = $9, clearances = $10, aerial_duels_won = $11, fouls_committed = $12,
+           minutes_played = $13, distance_covered_km = $14, sprint_distance_km = $15, top_speed_kmh = $16, accelerations = $17, decelerations = $18,
+           player_rating = $19
+       WHERE id = $20`,
+      [
+        d.goals, d.assists, d.shots, d.shots_on_target, d.key_passes, d.successful_dribbles,
+        d.tackles, d.interceptions, d.blocks, d.clearances, d.aerial_duels_won, d.fouls_committed,
+        d.minutes_played, d.distance_covered_km, d.sprint_distance_km, d.top_speed_kmh, d.accelerations, d.decelerations,
+        d.player_rating, id
+      ]
+    );
     res.json({ message: "Updated successfully" });
   } catch (err) {
     console.error("Update API error:", err);
