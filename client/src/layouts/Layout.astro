@@ -1,0 +1,20 @@
+---
+const pathname = Astro.url.pathname;
+---
+<div class="flex min-h-screen bg-gray-100">
+  <aside class="w-64 bg-slate-900 text-white p-6">
+    <h2 class="text-xl font-bold mb-8">World Cup 2026</h2>
+    <nav class="space-y-2">
+      <a href="/" class={`block p-3 rounded ${pathname === '/' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>
+        Performances
+      </a>
+      <a href="/ranking" class={`block p-3 rounded ${pathname === '/ranking' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>
+        Rankings
+      </a>
+    </nav>
+  </aside>
+
+  <main class="flex-1 p-8">
+    <slot />
+  </main>
+</div>

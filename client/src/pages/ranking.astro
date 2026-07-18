@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Layout from '../layouts/Layout.astro';
 
 const sortBy = Astro.url.searchParams.get('sortBy') || 'total_goals_tournament';
 
@@ -20,21 +21,20 @@ try {
 }
 ---
 
-<div class="p-8">
-  <div class="mb-6">
+<Layout>
+  <div class="mb-2">
     <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold">Rankings</h1>
-      <a href="/" class="text-blue-500 underline">Back to Performances</a>
     </div>
     <p class="text-gray-600">Explore the top players in World Cup 2026 across key performance metrics.</p>
   </div>
 
-  <div class="flex justify-end w-full mb-4">
+  <div class="flex justify-end w-full mb-3">
     <div class="flex items-center gap-2">
       <span class="text-sm font-semibold text-gray-700">Sort by</span>
       <select 
         id="sortSelect" 
-        class="border p-2 rounded w-40"
+        class="border p-2 rounded w-40 bg-white"
         onchange="window.location.href=`?sortBy=${this.value}`"
       >
         <option value="total_goals_tournament" selected={sortBy === 'total_goals_tournament'}>Goals</option>
@@ -75,4 +75,4 @@ try {
       </tbody>
     </table>
   </div>
-</div>
+</Layout>
