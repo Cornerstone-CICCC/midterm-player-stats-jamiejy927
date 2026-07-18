@@ -5,9 +5,6 @@ import { getPerformances } from "../models/performanceModel.ts";
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  console.log("--- request! ---");
-  console.log("REQ QUERY:", req.query); 
-  
   const page = parseInt(req.query.page as string) || 1;
   const limit = 20;
   const offset = (page - 1) * limit;
@@ -20,7 +17,6 @@ router.get("/", async (req, res) => {
 router.get("/player/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    
     const result = await pool.query("SELECT * FROM players WHERE player_id = $1", [id]);
     
     if (result.rows.length > 0) {
@@ -34,7 +30,6 @@ router.get("/player/:id", async (req, res) => {
   }
 });
 
-// Update
 router.put("/player/:id", async (req, res) => {
   const { id } = req.params;
   const { player_name, team, position } = req.body;
@@ -47,12 +42,26 @@ router.put("/player/:id", async (req, res) => {
 
 router.get("/rankings", async (req, res) => {
   const sortBy = req.query.sortBy as string || 'total_goals_tournament';
+
+  const columnConfigs: { [key: string]: string } = {
+    'player_name': 'ASC',
+    'team': 'ASC',
+    'total_goals_tournament': 'DESC',
+    'total_assists_tournament': 'DESC',
+    'tournament_rating': 'DESC'
+  };
+
+  const validSortColumns = Object.keys(columnConfigs);
+  const sortColumn = validSortColumns.includes(sortBy) ? sortBy : 'total_goals_tournament';
+  const order = columnConfigs[sortColumn];
+
   try {
     const result = await pool.query(
-      `SELECT * FROM players ORDER BY ${sortBy} DESC LIMIT 10`
+      `SELECT * FROM players ORDER BY ${sortColumn} ${order} LIMIT 10`
     );
     res.json(result.rows);
   } catch (err) {
+    console.error("Database Error:", err);
     res.status(500).json({ error: "Server Error" });
   }
 });

@@ -3,6 +3,14 @@ import '../styles/global.css';
 
 const sortBy = Astro.url.searchParams.get('sortBy') || 'total_goals_tournament';
 
+const columnMap: { [key: string]: string } = {
+  'player_name': 'Player',
+  'team': 'Team',
+  'total_goals_tournament': 'Goals',
+  'total_assists_tournament': 'Assists',
+  'tournament_rating': 'Rating'
+};
+
 let topPlayers = [];
 try {
   const response = await fetch(`http://localhost:3001/api/performance/rankings?sortBy=${sortBy}`);
@@ -41,11 +49,16 @@ try {
       <thead>
         <tr class="bg-gray-50 border-b">
           <th class="p-4 font-semibold">Rank</th>
-          <th class="p-4 font-semibold">Player</th>
-          <th class="p-4 font-semibold">Team</th>
-          <th class="p-4 font-semibold">Goals</th>
-          <th class="p-4 font-semibold">Assists</th>
-          <th class="p-4 font-semibold">Rating</th>
+          <th class="p-4 font-semibold text-gray-700">Player</th>
+          <th class="p-4 font-semibold text-gray-700">Team</th>
+          
+          {Object.keys(columnMap).filter(key => !['player_name', 'team'].includes(key)).map((col) => (
+            <th class="p-4 font-semibold">
+              <a href={`?sortBy=${col}`} class={`flex items-center gap-1 ${sortBy === col ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'}`}>
+                {columnMap[col]}
+              </a>
+            </th>
+          ))}
         </tr>
       </thead>
       <tbody>
